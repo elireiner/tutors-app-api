@@ -6,6 +6,7 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 //winston is a logger
 const winston = require('winston');
+const userRouter = require('./users/users-routers')
 
 const app = express()
 
@@ -49,6 +50,8 @@ app.use(function validateBearerToken(req, res, next) {
 app.get('/', (req, res) => {
     res.send('Hello, world!')
 })
+
+app.use('/api/users', userRouter)
 
 app.use(function errorHandler(error, req, res, next) {
     let response
