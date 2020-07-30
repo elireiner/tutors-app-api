@@ -48,7 +48,7 @@ app.use(function validateBearerToken(req, res, next) {
 }) 
 
 app.get('/', (req, res) => {
-    res.send('Hello, world!')
+    res.send('Hello, world! i\'m here')
 })
 
 app.use('/api/users', userRouter)
