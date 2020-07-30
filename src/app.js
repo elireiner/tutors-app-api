@@ -60,7 +60,7 @@ app.use(function errorHandler(error, req, res, next) {
     } else {
         response = { message: error.message, error }
     }
-    res.status(500).json(response)
+    res.status(500).json({ message: error.message, error })
 })
 
 module.exports = app
