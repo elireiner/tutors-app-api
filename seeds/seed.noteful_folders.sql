@@ -1,5 +1,0 @@
-insert into users (id, first_name, last_name, email, user_password, gender, rating, tutor, student) values (1, 'Felicio', 'Heading', 'fheading0@nyu.edu', '5u2v1E1BKrct', 'Male', 1, true, false);
-insert into users (id, first_name, last_name, email, user_password, gender, rating, tutor, student) values (2, 'Blinny', 'Haker', 'bhaker1@free.fr', 'eqfJI8rCdPZo', 'Female', 2, true, false);
-insert into users (id, first_name, last_name, email, user_password, gender, rating, tutor, student) values (3, 'Dorelle', 'McMylor', 'dmcmylor2@live.com', '4FRsPQo1', 'Female', 3, true, false);
-insert into users (id, first_name, last_name, email, user_password, gender, rating, tutor, student) values (4, 'Avery', 'Natte', 'anatte3@yale.edu', 'RrDnKB3X4JO', 'Male', 4, true, false);
-insert into users (id, first_name, last_name, email, user_password, gender, rating, tutor, student) values (5, 'Maximilian', 'Druhan', 'mdruhan4@diigo.com', '4KUXWkF', 'Male', 5, false, false);
