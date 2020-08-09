@@ -9,5 +9,10 @@ CREATE TABLE users (
     tutor boolean NOT NULL,
     gender VARCHAR NOT NULL,
     rating INTEGER DEFAULT NULL,
+    fee INTEGER,
+    CONSTRAINT if_tutor_then_fee_is_not_null 
+    CHECK ( (NOT tutor) OR (fee IS NOT NULL) ),
+    CONSTRAINT tutor_or_student_must_be_true 
+    CHECK ( (tutor) OR (student) ),
     UNIQUE (email)
 )
