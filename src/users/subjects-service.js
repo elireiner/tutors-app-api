@@ -4,11 +4,11 @@ const SubjectsService = {
     },
 
     insertSubject(knex, newSubject) {
-        return knex
-            .insert(newSubject)
-            .into('subjects')
+        return knex('subjects')
+            .insert({subject_name: newSubject})
             .returning('*')
             .then(rows => {
+                console.log(rows)
                 return rows[0]
             })
     },
@@ -28,6 +28,10 @@ const SubjectsService = {
             .where({ id })
             .update(newSubjectFields)
     },
+
+    getBySubject(knex, subject){
+        return knex.from('subjects').select('subject_id').where('subject_name', subject).first()
+    }
 }
 
 module.exports = SubjectsService
