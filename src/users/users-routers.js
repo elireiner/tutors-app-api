@@ -83,15 +83,10 @@ const addSubjectsToEachUser = (knexInstance, users, res) => {
             //their subject
             return res.status(200).send(connectEachUserWithSubjects(users, results));
         }).catch((err) => {
-
-            console.log(err);
-
             return res.status(500).end();
         })
     })
         .catch(err => {
-            console.log(err);
-
             return res.status(500).end();
         })
 }
@@ -131,7 +126,6 @@ usersRouter
             .then(res => {
                 user.push(res)
                 tutorSubjectRelation[0].user_id = user[0].user_id
-                console.log(user)
                 return SubjectsService.getBySubject(
                     req.app.get('db'),
                     subjects
@@ -150,7 +144,6 @@ usersRouter
             })
             .then(res => {
                 tutorSubjectRelation[0].subjects_id = res.subject_id
-                console.log(tutorSubjectRelation);
                 return TutorsSubjectsService.insertTutorSubject(
                     req.app.get('db'),
                     tutorSubjectRelation
@@ -165,7 +158,6 @@ usersRouter
             //iterate over the array to insert it
 
             .then(response => {
-                console.log(response)
                 res
                     .status(201)
                     .location(path.posix.join(req.originalUrl, `/${user[0].id}`))
@@ -217,7 +209,6 @@ usersRouter
                 return names
             })
             .then(function (results) {
-                console.log(results)
                 res.user.subjects
                 //Since xss removes the array and combines all elements into one,
                 //We need to restore them 

@@ -8,7 +8,6 @@ const SubjectsService = {
             .insert({subject_name: newSubject})
             .returning('*')
             .then(rows => {
-                console.log(rows)
                 return rows[0]
             })
     },
