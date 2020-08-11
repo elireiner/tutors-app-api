@@ -2,8 +2,9 @@ const path = require('path');
 const express = require('express')
 const xss = require('xss')
 const UsersService = require('./users-service')
-const SubjectsServes = require('./subjects-service')
+const SubjectsService = require('./subjects-service')
 const TutorsSubjectsService = require('./tutors_subjects-service')
+const RouterHelpers = require('./router-helpers');
 
 const usersRouter = express.Router()
 const jsonParser = express.json()
@@ -31,8 +32,6 @@ const connectEachUserWithSubjects = (users, subjects) => {
             subjectsArray.push(subject[0].subject_name)
         })
 
-
-
         //Now that we have a clean array of subject names,
         //we can finally add it to the each user object
 
@@ -50,7 +49,7 @@ const testIt = (knexInstance, subjectsArray) => {
     return Promise.all(
         subjectsArray.map((id) => {
 
-            return SubjectsServes.getById(knexInstance, id.subjects_id);
+            return SubjectsService.getById(knexInstance, id.subjects_id);
 
         })).then(res => {
             return res
@@ -71,7 +70,7 @@ const addSubjectsToEachUser = (knexInstance, users, res) => {
     ).then((userResults) => {
         //resolve all promises; userResult is an array of results from promises above
         //it includes the an array of subject ids
-        
+
         //Since we want to return to the end user the name of the subjects
         //instead of the subject id, we need to get the names:
         Promise.all(userResults.reduce((acc, el) => {
@@ -111,10 +110,11 @@ usersRouter
 
     })
     .post(jsonParser, (req, res, next) => {
-        const { first_name, last_name, email, user_password, gender, tutor, student } = req.body;
-        const newUser = { first_name, last_name, email, user_password, gender, tutor, student };
+        const { first_name, last_name, email, user_password, gender, tutor, student, fee, in_person, online_medium, subjects } = req.body;
+        const userFields = { first_name, last_name, email, user_password, gender, tutor, student, fee, in_person, online_medium, subjects };
+        const newUser = { first_name, last_name, email, user_password, gender, tutor, student, fee, in_person, online_medium };
 
-        for (const [key, value] of Object.entries(newUser)) {
+        for (const [key, value] of Object.entries(userFields)) {
             if (value === null) {
                 return res.status(400).json({
                     error: { message: `Missing ${key} in request body` }
@@ -122,42 +122,65 @@ usersRouter
             }
         }
 
+        const user = []
+        const tutorSubjectRelation = [{ subjects_id: null, user_id: null }]
         UsersService.insertUser(
             req.app.get('db'),
             newUser
         )
+            .then(res => {
+                user.push(res)
+                tutorSubjectRelation[0].user_id = user[0].user_id
+                console.log(user)
+                return SubjectsService.getBySubject(
+                    req.app.get('db'),
+                    subjects
+                )
+            })
+            .then(res => {
 
-            .then(user => {
+                if (typeof res === 'undefined') {
+
+                    return SubjectsService.insertSubject(
+                        req.app.get('db'),
+                        subjects
+                    )
+                }
+                return res
+            })
+            .then(res => {
+                tutorSubjectRelation[0].subjects_id = res.subject_id
+                console.log(tutorSubjectRelation);
+                return TutorsSubjectsService.insertTutorSubject(
+                    req.app.get('db'),
+                    tutorSubjectRelation
+                )
+
+            })
+
+
+            //if the subject does not exist yet, enter it in the subjects table
+            //then get the id of the user and the id of each subject
+            //create an array of each user subject pair (in this case the same user with multiple subjects)
+            //iterate over the array to insert it
+
+            .then(response => {
+                console.log(response)
                 res
                     .status(201)
-                    .location(path.posix.join(req.originalUrl, `/${user.id}`))
+                    .location(path.posix.join(req.originalUrl, `/${user[0].id}`))
                     .json(serialize(user))
             })
             .catch(next)
     })
-
-
-function getSubjectName(id, knexInstance) {
-    return SubjectsServes.getById(
-        knexInstance,
-        id.subjects_id
-    )
-}
-
-function getMultipleSubjectsName(subjectsIds, knexInstance) {
-
-    const allSubjectNames = subjectsIds.map(id => {
-        return getSubjectName(id, knexInstance)
+    .delete(jsonParser, (req, res, next) => {
+        TutorsSubjectsService.deleteAllTutorSubject(req.app.get('db'))
+        UsersService.deleteAllUsers(req.app.get('db'))
+            .then(numRowsAffected => {
+                res.status(204).end()
+            })
+            .catch(next)
     })
-    return Promise.all(allSubjectNames)
-}
-
-function getSubjectId(userId, knexInstance) {
-    return TutorsSubjectsService.getAllSubjectsForATutor(
-        knexInstance,
-        userId
-    )
-}
 
 usersRouter
     .route('/:user_id')
@@ -182,9 +205,9 @@ usersRouter
         res.user.subjects = []
         let knexInstance = req.app.get('db')
 
-        getSubjectId(res.user.user_id, knexInstance)
+        RouterHelpers.getSubjectId(res.user.user_id, knexInstance)
             .then(function (subjectsIds) {
-                return getMultipleSubjectsName(subjectsIds, knexInstance)
+                return RouterHelpers.getMultipleSubjectsName(subjectsIds, knexInstance)
             })
             .then(function (name) {
                 const names = []
@@ -194,7 +217,12 @@ usersRouter
                 return names
             })
             .then(function (results) {
-                res.user.subjects = results
+                console.log(results)
+                res.user.subjects
+                //Since xss removes the array and combines all elements into one,
+                //We need to restore them 
+                res.user.subjects = xss(results).split(",");
+
                 res.json({
                     id: res.user.user_id,
                     first_name: xss(res.user.first_name),
