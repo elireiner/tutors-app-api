@@ -3,16 +3,16 @@ const TutorsSubjectsService = {
         return knex.select('*').from('tutors_subjects')
     },
 
+
     insertTutorSubject(knex, newTutorSubject) {
-        return knex
+        return knex('tutors_subjects')
             .insert(newTutorSubject)
-            .into('tutors_subjects')
             .returning('*')
             .then(rows => {
                 return rows[0]
             })
     },
-    
+
     getAllSubjectsForATutor(knex, id) {
         return knex.from('tutors_subjects').select('subjects_id').where('user_id', id)
     },
@@ -22,6 +22,12 @@ const TutorsSubjectsService = {
             .where({ id })
             .delete()
     },
+
+    deleteAllTutorSubject(knex) {
+        return knex('tutors_subjects')
+            .delete()
+    },
+
 
     updateTutorSubject(knex, id, newTutorSubjectFields) {
         return knex('tutors_subjects')

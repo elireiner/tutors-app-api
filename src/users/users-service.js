@@ -23,6 +23,11 @@ const UsersService = {
             .delete()
     },
 
+    deleteAllUsers(knex) {
+        return knex('users')
+            .delete()
+    },
+
     updateUser(knex, id, newUserFields) {
         return knex('users')
             .where({ 'user_id': id  })
