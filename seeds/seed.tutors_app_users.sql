@@ -1,5 +1,5 @@
-insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee) values ('Felicio', 'Heading', 'fheading0@nyu.edu', '5u2v1E1BKrct', 'Male', 1, true, false, 25);
-insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee) values ('Blinny', 'Haker', 'bhaker1@free.fr', 'eqfJI8rCdPZo', 'Female', 2, true, false, 50);
-insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee) values ('Dorelle', 'McMylor', 'dmcmylor2@live.com', '4FRsPQo1', 'Female', 3, true, false, 40);
-insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee) values ('Avery', 'Natte', 'anatte3@yale.edu', 'RrDnKB3X4JO', 'Male', 4, true, false, 60);
-insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student) values ('Maximilian', 'Druhan', 'mdruhan4@diigo.com', '4KUXWkF', 'Male', 5, false, true);
+insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee, in_person, online_medium) values ('Felicio', 'Heading', 'fheading0@nyu.edu', '5u2v1E1BKrct', 'Male', 1, true, false, 25, true, true);
+insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee, in_person, online_medium) values ('Blinny', 'Haker', 'bhaker1@free.fr', 'eqfJI8rCdPZo', 'Female', 2, true, false, 50, true, false);
+insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee, in_person, online_medium) values ('Dorelle', 'McMylor', 'dmcmylor2@live.com', '4FRsPQo1', 'Female', 3, true, false, 40, true, true);
+insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student, fee,  in_person, online_medium) values ('Avery', 'Natte', 'anatte3@yale.edu', 'RrDnKB3X4JO', 'Male', 4, true, false, 60, false, true);
+insert into users (first_name, last_name, email, user_password, gender, rating, tutor, student,  in_person, online_medium) values ('Maximilian', 'Druhan', 'mdruhan4@diigo.com', '4KUXWkF', 'Male', 5, false, true, true, true);
