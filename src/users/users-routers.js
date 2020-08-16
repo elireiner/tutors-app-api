@@ -117,7 +117,7 @@ usersRouter
             }
         }
 
-        const user = []
+        let user = []
         const tutorSubjectRelation = [{ subjects_id: null, user_id: null }]
         UsersService.insertUser(
             req.app.get('db'),
@@ -126,35 +126,95 @@ usersRouter
             .then(res => {
                 user.push(res)
                 tutorSubjectRelation[0].user_id = user[0].user_id
-                return SubjectsService.getBySubject(
-                    req.app.get('db'),
-                    subjects
-                )
-            })
-            .then(res => {
 
-                if (typeof res === 'undefined') {
-
-                    return SubjectsService.insertSubject(
+                subjects.map(subject => {
+                    return SubjectsService.getBySubject(
                         req.app.get('db'),
-                        subjects
+                        subject
                     )
-                }
-                return res
+                        .then(res => {
+
+                            if (typeof res === 'undefined') {
+
+                                return SubjectsService.insertSubject(
+                                    req.app.get('db'),
+                                    subject
+                                )
+                            }
+                            return res
+                        })
+                        .then(res => {
+                            tutorSubjectRelation[0].subjects_id = res.subject_id
+                            return TutorsSubjectsService.insertTutorSubject(
+                                req.app.get('db'),
+                                tutorSubjectRelation
+                            )
+
+                        })
+                })
             })
-            .then(res => {
-                tutorSubjectRelation[0].subjects_id = res.subject_id
-                return TutorsSubjectsService.insertTutorSubject(
-                    req.app.get('db'),
-                    tutorSubjectRelation
-                )
+            .then(function () {
+                //till here we inserted the new user
+                //now we will retrieve the new user and return them
+
+                //get the user id through the unique email
+
+                return UsersService.getByEmail(req.app.get('db'), email)
 
             })
-            .then(response => {
+            .then(function (userId) {
+
+                UsersService.getById(
+                    req.app.get('db'),
+                    userId.user_id
+                )
+                    .then(user => {
+                        if (!user) {
+                            return res.status(404).json({
+                                error: { message: `user does not exist` }
+                            })
+                        }
+                        res.user = user;
+                        res.user.subjects = []
+                    })
+                return userId.user_id
+            })
+            .then(function (userId) {
+                return RouterHelpers.getSubjectId(userId, req.app.get('db'))
+            })
+            .then(function (subjectsIds) {
+
+                return RouterHelpers.getMultipleSubjectsName(subjectsIds, req.app.get('db'))
+            })
+            .then(function (name) {
+
+                const names = []
+                name.map(subject => {
+                    names.push(subject[0].subject_name)
+                })
+
+                return names
+            })
+            .then(function (results) {
+                //Since xss removes the array and combines all elements into one,
+                //We need to restore them 
+                res.user.subjects = xss(results).split(",");
+
                 res
                     .status(201)
                     .location(path.posix.join(req.originalUrl, `/${user[0].id}`))
-                    .json(serialize(user))
+                    .json({
+                        id: res.user.user_id,
+                        first_name: xss(res.user.first_name),
+                        last_name: xss(res.user.last_name),
+                        email: xss(res.user.email),
+                        password: xss(res.user.password),
+                        gender: xss(res.user.gender),
+                        rating: res.user.rating,
+                        tutor: res.user.tutor,
+                        student: res.user.student,
+                        subjects: res.user.subjects
+                    })
             })
             .catch(next)
     })
