@@ -13,7 +13,7 @@ const SubjectsService = {
     },
 
     getById(knex, id) {
-        return knex.from('subjects').select('subject_name').where('subject_id', id)
+       return knex.from('subjects').select('subject_name').where('subject_id', id)
     },
 
     deleteSubject(knex, id) {
