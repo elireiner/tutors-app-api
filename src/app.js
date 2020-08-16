@@ -1,67 +1,81 @@
-require('dotenv').config();
-const express = require('express')
-const name = 'My App';
-const morgan = require('morgan')
-const cors = require('cors')
-const helmet = require('helmet')
-const { NODE_ENV } = require('./config')
+require("dotenv").config();
+const express = require("express");
+const name = "My App";
+const morgan = require("morgan");
+const cors = require("cors");
+const helmet = require("helmet");
+const { NODE_ENV } = require("./config");
 //winston is a logger
-const winston = require('winston');
-const userRouter = require('./users/users-routers')
+const winston = require("winston");
+const userRouter = require("./users/users-routers");
 
-const app = express()
+const app = express();
 
-const morganOption = (NODE_ENV === 'production')
-    ? 'tiny'
-    : 'dev';
+const morganOption = NODE_ENV === "production" ? "tiny" : "dev";
 
-app.use(morgan(morganOption))
-app.use(express.json())
-app.use(helmet())
-app.use(cors())
+app.use(morgan(morganOption));
+app.use(express.json());
+app.use(helmet());
+app.use(cors());
 
 // set up winston
 const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-        new winston.transports.File({ filename: 'info.log' })
-    ]
+  level: "info",
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({
+      filename: "info.log",
+    }),
+  ],
 });
 
 // continue winston set up to log to console when in development
-if (NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: winston.format.simple()
-    }));
+if (NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
 }
 
 app.use(function validateBearerToken(req, res, next) {
-  const apiToken = process.env.API_TOKEN
-  const authToken = req.get('Authorization')
+  const apiToken = process.env.API_TOKEN;
+  const authToken = req.get("Authorization");
 
-  if (!authToken || authToken.split(' ')[1] !== apiToken) {
+  if (!authToken || authToken.split(" ")[1] !== apiToken) {
     logger.error(`Unauthorized request to path: ${req.path}`);
-    return res.status(401).json({ error: 'Unauthorized request' })
+    return res.status(401).json({
+      error: "Unauthorized request",
+    });
   }
 
-  next()
-}) 
+  next();
+});
 
-app.get('/', (req, res) => {
-    res.send('Hello, world! i\'m here')
-})
+app.get("/", (req, res) => {
+  res.send("Hello, world! i'm here");
+});
 
-app.use('/api/users', userRouter)
+app.use("/api/users", userRouter);
 
 app.use(function errorHandler(error, req, res, next) {
-    let response
-    if (NODE_ENV === 'production') {
-        response = { error: { message: 'server error' } }
-    } else {
-        response = { message: error.message, error }
-    }
-    res.status(500).json({ message: error.message, error })
-})
+  let response;
+  if (NODE_ENV === "production") {
+    response = {
+      error: {
+        message: "server error",
+      },
+    };
+  } else {
+    response = {
+      message: error.message,
+      error,
+    };
+  }
+  res.status(500).json({
+    message: error.message,
+    error,
+  });
+});
 
-module.exports = app
+module.exports = app;
