@@ -150,15 +150,8 @@ usersRouter
                 )
 
             })
-
-
-            //if the subject does not exist yet, enter it in the subjects table
-            //then get the id of the user and the id of each subject
-            //create an array of each user subject pair (in this case the same user with multiple subjects)
-            //iterate over the array to insert it
-
             .then(response => {
-                response
+                res
                     .status(201)
                     .location(path.posix.join(req.originalUrl, `/${user[0].id}`))
                     .json(serialize(user))
