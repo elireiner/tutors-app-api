@@ -158,7 +158,7 @@ usersRouter
             //iterate over the array to insert it
 
             .then(response => {
-                res
+                response
                     .status(201)
                     .location(path.posix.join(req.originalUrl, `/${user[0].id}`))
                     .json(serialize(user))
