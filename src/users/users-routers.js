@@ -151,6 +151,7 @@ usersRouter
                             )
 
                         })
+                        .catch(next)
                 })
             })
             .then(function () {
@@ -280,6 +281,7 @@ usersRouter
                     subjects: res.user.subjects
                 })
             })
+            .catch(next)
 
     })
     .delete(jsonParser, (req, res, next) => {
