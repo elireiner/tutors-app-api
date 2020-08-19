@@ -1,5 +1,5 @@
 const UsersService = require('./users-service')
-const SubjectsServes = require('./subjects-service')
+const SubjectsService = require('./subjects-service')
 const TutorsSubjectsService = require('./tutors_subjects-service')
 
 module.exports = {
@@ -7,12 +7,17 @@ module.exports = {
     getMultipleSubjectsName(subjectsIds, knexInstance) {
 
         const allSubjectNames = subjectsIds.map(id => {
-            return SubjectsServes.getById(
+            return SubjectsService.getById(
                 knexInstance,
                 id.subjects_id
             )
         })
         return Promise.all(allSubjectNames)
+        .catch((err) => {
+            return res.status(500).json({
+                error: { message: `This is the message: ${err.message}` }
+            })
+        })
     },
 
     getSubjectId(userId, knexInstance) {
@@ -20,5 +25,46 @@ module.exports = {
             knexInstance,
             userId
         )
-    }
+        .catch((err) => {
+            return res.status(500).json({
+                error: { message: `This is the message: ${err.message}` }
+            })
+        })
+    },
+
+    handleTutorSubjectRelations(knexInstance, subject, res, tutorSubjectRelation) {
+        if (typeof res === "undefined" || res.length === 0) {
+            SubjectsService.getBySubject(
+                knexInstance,
+                subject
+            ).then(res => {
+                console.log(res)
+                tutorSubjectRelation[0].subjects_id = res.subject_id
+                return TutorsSubjectsService.insertTutorSubject(
+                    knexInstance,
+                    tutorSubjectRelation
+                )
+            })
+            .catch((err) => {
+                return res.status(500).json({
+                    error: { message: `This is the message: ${err.message}` }
+                })
+            })
+        }
+        else {
+            tutorSubjectRelation[0].subjects_id = res.subject_id
+            return TutorsSubjectsService.insertTutorSubject(
+                knexInstance,
+                tutorSubjectRelation
+            )
+            .catch((err) => {
+                return res.status(500).json({
+                    error: { message: `This is the message: ${err.message}` }
+                })
+            })
+        }
+
+    },
+
+
 }
