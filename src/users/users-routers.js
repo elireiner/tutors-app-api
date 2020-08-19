@@ -123,8 +123,8 @@ usersRouter
             req.app.get('db'),
             newUser
         )
-            .then(res => {
-                user.push(res)
+            .then(response => {
+                user.push(response)
                 tutorSubjectRelation[0].user_id = user[0].user_id
 
                 subjects.map(subject => {
@@ -132,27 +132,41 @@ usersRouter
                         req.app.get('db'),
                         subject
                     )
-                        .then(res => {
-
-                            if (typeof res === 'undefined') {
-
-                                return SubjectsService.insertSubject(
+                        .then(response => {
+                            if (typeof response === 'undefined') {
+                                // TODO: update method to return new subject id
+                                // TODO: then remove get id in the helper method in next then
+                                SubjectsService.insertSubject(
                                     req.app.get('db'),
                                     subject
                                 )
+                                    .then(response => {
+                                        RouterHelpers.handleTutorSubjectRelations(
+                                            req.app.get('db'),
+                                            subject,
+                                            response,
+                                            tutorSubjectRelation
+                                        )
+                                    })
+                                    .catch((err) => {
+                                        return res.status(500).json({
+                                            error: { message: `This is the message: ${err.message}` }
+                                        })
+                                    })
                             }
-                            return res
-                        })
-                        .then(res => {
-                            tutorSubjectRelation[0].subjects_id = res.subject_id
-                            return TutorsSubjectsService.insertTutorSubject(
-                                req.app.get('db'),
-                                tutorSubjectRelation
-                            )
+                            else {
+                                RouterHelpers.handleTutorSubjectRelations(
+                                    req.app.get('db'),
+                                    subject,
+                                    response,
+                                    tutorSubjectRelation
+                                )
+                            }
 
-                        })
-                        .catch(next)
+                        }).catch(next)
+
                 })
+
             })
             .then(function () {
                 //till here we inserted the new user
@@ -172,19 +186,21 @@ usersRouter
                     .then(user => {
                         if (!user) {
                             return res.status(404).json({
-                                error: { message: `user does not exist` }
+                                error: { message: `User does not exist` }
                             })
                         }
                         res.user = user;
                         res.user.subjects = []
                     })
+             
                 return userId.user_id
             })
             .then(function (userId) {
+                console.log(userId)
                 return RouterHelpers.getSubjectId(userId, req.app.get('db'))
             })
             .then(function (subjectsIds) {
-
+                console.log(subjectsIds)
                 return RouterHelpers.getMultipleSubjectsName(subjectsIds, req.app.get('db'))
             })
             .then(function (name) {
@@ -197,8 +213,10 @@ usersRouter
                 return names
             })
             .then(function (results) {
+                // ! why is this an empty array?
                 //Since xss removes the array and combines all elements into one,
                 //We need to restore them 
+                console.log("Am I an empty array?", results, "AND WHAT IS USER?", user)
                 res.user.subjects = xss(results).split(",");
 
                 res
@@ -209,7 +227,7 @@ usersRouter
                         first_name: xss(res.user.first_name),
                         last_name: xss(res.user.last_name),
                         email: xss(res.user.email),
-                        password: xss(res.user.password),
+                        password: xss(res.user.user_password),
                         gender: xss(res.user.gender),
                         rating: res.user.rating,
                         tutor: res.user.tutor,
@@ -263,7 +281,6 @@ usersRouter
                 return names
             })
             .then(function (results) {
-                res.user.subjects
                 //Since xss removes the array and combines all elements into one,
                 //We need to restore them 
                 res.user.subjects = xss(results).split(",");
