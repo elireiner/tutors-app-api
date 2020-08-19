@@ -4,8 +4,9 @@ const SubjectsService = {
     },
 
     insertSubject(knex, newSubject) {
-        return knex('subjects')
+        return knex
             .insert({subject_name: newSubject})
+            .into('subjects')
             .returning('*')
             .then(rows => {
                 return rows[0]
@@ -13,7 +14,7 @@ const SubjectsService = {
     },
 
     getById(knex, id) {
-       return knex.from('subjects').select('subject_name').where('subject_id', id)
+        return knex.from('subjects').select('subject_name').where('subject_id', id)
     },
 
     deleteSubject(knex, id) {
@@ -28,7 +29,7 @@ const SubjectsService = {
             .update(newSubjectFields)
     },
 
-    getBySubject(knex, subject){
+    getBySubject(knex, subject) {
         return knex.from('subjects').select('subject_id').where('subject_name', subject).first()
     }
 }
