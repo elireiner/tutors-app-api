@@ -1,6 +1,5 @@
 const knex = require('knex')
 const app = require('../src/app')
-const { expect } = require('chai')
 const supertest = require('supertest');
 
 describe('Tutors app', () => {
@@ -27,7 +26,7 @@ describe('Tutors app', () => {
     describe('GET api/users', () => {
         context('when the there are no users', () => {
             it('returns 200 and []', () => {
-                return supertest()
+                return supertest(app)
                     .get('/api/users')
                     .set({ "Authorization": `Bearer ${process.env.API_TOKEN}`})
                     .expect(200, [])
