@@ -118,6 +118,7 @@ usersRouter
         }
 
         let user = []
+        console.log("Hi I'm here:", newUser)
         const tutorSubjectRelation = [{ subjects_id: null, user_id: null }]
         UsersService.insertUser(
             req.app.get('db'),
@@ -204,7 +205,7 @@ usersRouter
                 return RouterHelpers.getMultipleSubjectsName(subjectsIds, req.app.get('db'))
             })
             .then(function (name) {
-
+                console.log("I am name", name)
                 const names = []
                 name.map(subject => {
                     names.push(subject[0].subject_name)
@@ -216,7 +217,7 @@ usersRouter
                 // ! why is this an empty array?
                 //Since xss removes the array and combines all elements into one,
                 //We need to restore them 
-                console.log("Am I an empty array?", results, "AND WHAT IS USER?", user)
+                console.log("I am results", results, "AND WHAT IS USER?", user)
                 res.user.subjects = xss(results).split(",");
 
                 res
