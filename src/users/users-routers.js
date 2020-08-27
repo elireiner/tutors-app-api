@@ -130,6 +130,7 @@ usersRouter
         }
 
         let user = []
+        console.log("Hi I'm here:", newUser)
         const tutorSubjectRelation = [{ subjects_id: null, user_id: null }]
         UsersService.insertUser(
             req.app.get('db'),
