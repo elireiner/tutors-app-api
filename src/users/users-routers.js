@@ -248,7 +248,7 @@ usersRouter
                 res.user.subjects = xss(results).split(",");
 
                 res.json({
-                    id: res.user.user_id,
+                    user_id: res.user.user_id,
                     first_name: xss(res.user.first_name),
                     last_name: xss(res.user.last_name),
                     email: xss(res.user.email),
