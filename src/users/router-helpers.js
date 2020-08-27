@@ -25,11 +25,6 @@ module.exports = {
             knexInstance,
             userId
         )
-        .catch((err) => {
-            return res.status(500).json({
-                error: { message: `This is the message: ${err.message}` }
-            })
-        })
     },
 
     handleTutorSubjectRelations(knexInstance, subject, res, tutorSubjectRelation) {
@@ -38,7 +33,6 @@ module.exports = {
                 knexInstance,
                 subject
             ).then(res => {
-                console.log(res)
                 tutorSubjectRelation[0].subjects_id = res.subject_id
                 return TutorsSubjectsService.insertTutorSubject(
                     knexInstance,
