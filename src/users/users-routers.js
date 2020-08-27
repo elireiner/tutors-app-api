@@ -33,7 +33,7 @@ const connectEachUserWithSubjects = (users, subjects) => {
         user.last_name = xss(user.last_name)
         user.user_password = xss(user.user_password)
 
-        //Now since subjects is a little messy, with a lot of nested arrays
+        //Next, since subjects is a little messy with a lot of nested arrays
         //Let's clean it up!
         let subjectsArray = []
         subjects[i].map(subject => {
@@ -109,7 +109,6 @@ usersRouter
         //get all users
         UsersService.getAllUsers(knexInstance)
             .then(users => {
-                //console.log(users)
                 //since subjects for each user isn't returned, we need to add them
                 return addSubjectsToEachUser(knexInstance, users, res)
             })
