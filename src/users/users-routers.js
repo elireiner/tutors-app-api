@@ -5,6 +5,7 @@ const UsersService = require('./users-service')
 const SubjectsService = require('./subjects-service')
 const TutorsSubjectsService = require('./tutors_subjects-service')
 const RouterHelpers = require('./router-helpers');
+const knex = require('knex');
 
 const usersRouter = express.Router()
 const jsonParser = express.json()
@@ -13,9 +14,9 @@ const serialize = user => ({
     id: user.id,
     first_name: user.first_name,
     last_name: user.last_name,
-    email: user.email,
+    email: xss(user.email),
     password: user.password,
-    gender: user.gender,
+    gender: xss(user.gender),
     rating: user.rating,
     tutor: user.tutor,
     student: user.student,
@@ -25,7 +26,14 @@ const serialize = user => ({
 const connectEachUserWithSubjects = (users, subjects) => {
     let i = 0
     users.forEach(user => {
-        //subjects is a little messy, with a lot of nested arrays
+        //First let's prevent an xss attack
+        user.email = xss(user.email)
+        user.gender = xss(user.gender)
+        user.first_name = xss(user.first_name)
+        user.last_name = xss(user.last_name)
+        user.user_password = xss(user.user_password)
+
+        //Now since subjects is a little messy, with a lot of nested arrays
         //Let's clean it up!
         let subjectsArray = []
         subjects[i].map(subject => {
@@ -81,12 +89,15 @@ const addSubjectsToEachUser = (knexInstance, users, res) => {
             //The previous promise resolves to an array of subject names
             //However, we need to return an array of user objects and add to each user
             //their subject
+            //* Here the response is sent to the end user
             return res.status(200).send(connectEachUserWithSubjects(users, results));
         }).catch((err) => {
+            //console.log("86:", err.message)
             return res.status(500).end();
         })
     })
         .catch(err => {
+            //console.log("90:", err.message)
             return res.status(500).end();
         })
 }
@@ -98,6 +109,7 @@ usersRouter
         //get all users
         UsersService.getAllUsers(knexInstance)
             .then(users => {
+                //console.log(users)
                 //since subjects for each user isn't returned, we need to add them
                 return addSubjectsToEachUser(knexInstance, users, res)
             })
@@ -163,10 +175,9 @@ usersRouter
                                 )
                             }
 
-                        }).catch(next)
-
+                        })
+                        .catch(next)
                 })
-
             })
             .then(function () {
                 //till here we inserted the new user
@@ -177,62 +188,13 @@ usersRouter
                 return UsersService.getByEmail(req.app.get('db'), email)
 
             })
-            .then(function (userId) {
-
-                UsersService.getById(
-                    req.app.get('db'),
-                    userId.user_id
-                )
-                    .then(user => {
-                        if (!user) {
-                            return res.status(404).json({
-                                error: { message: `User does not exist` }
-                            })
-                        }
-                        res.user = user;
-                        res.user.subjects = []
-                    })
-             
-                return userId.user_id
-            })
-            .then(function (userId) {
-                console.log(userId)
-                return RouterHelpers.getSubjectId(userId, req.app.get('db'))
-            })
-            .then(function (subjectsIds) {
-                console.log(subjectsIds)
-                return RouterHelpers.getMultipleSubjectsName(subjectsIds, req.app.get('db'))
-            })
-            .then(function (name) {
-
-                const names = []
-                name.map(subject => {
-                    names.push(subject[0].subject_name)
-                })
-
-                return names
-            })
-            .then(function (results) {
-                // ! why is this an empty array?
-                //Since xss removes the array and combines all elements into one,
-                //We need to restore them 
-                console.log("Am I an empty array?", results, "AND WHAT IS USER?", user)
-                res.user.subjects = xss(results).split(",");
-
+            .then(function (id) {
+                id = id.user_id
                 res
                     .status(201)
-                    .location(path.posix.join(req.originalUrl, `/${user[0].id}`))
+                    .location(path.posix.join(req.originalUrl, `/${id}`))
                     .json({
-                        id: res.user.user_id,
-                        first_name: xss(res.user.first_name),
-                        last_name: xss(res.user.last_name),
-                        email: xss(res.user.email),
-                        password: xss(res.user.user_password),
-                        gender: xss(res.user.gender),
-                        rating: res.user.rating,
-                        tutor: res.user.tutor,
-                        student: res.user.student,
-                        subjects: res.user.subjects
+                        user_id: id
                     })
             })
             .catch(next)
