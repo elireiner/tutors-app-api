@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "connect": "psql -U dunder_mifflin tutors_app",
+    "connect:test": "psql -U dunder_mifflin tutors_app_test",
+    "connect:production": "heroku pg:psql",
     "migrate": "postgrator --config postgrator-config.js",
     "migrate:test": "env NODE_ENV=test npm run migrate",
     "migrate:production": "env SSL=true DATABASE_URL=$(heroku config:get DATABASE_URL) npm run migrate",
