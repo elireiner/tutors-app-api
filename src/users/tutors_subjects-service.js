@@ -15,11 +15,7 @@ const TutorsSubjectsService = {
     },
 
     getAllSubjectsForATutor(knex, id) {
-        console.log("I'm id:", typeof id)
-        return knex.from('tutors_subjects').select('subjects_id').where('user_id', id)
-        .then(data => {
-            console.log("I'm data", data)
-        })
+        return knex.select('subjects_id').from('tutors_subjects').where('user_id', id)
     },
 
     deleteTutorSubject(knex, id) {
