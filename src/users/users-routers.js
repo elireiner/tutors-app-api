@@ -116,12 +116,12 @@ usersRouter
 
     })
     .post(jsonParser, (req, res, next) => {
-        const { first_name, last_name, email, user_password, gender, tutor, student, fee, in_person, online_medium, subjects } = req.body;
+        const { first_name, last_name, email, user_password, gender, tutor, student, fee, rating, in_person, online_medium, subjects } = req.body;
         const userFields = { first_name, last_name, email, user_password, gender, tutor, student, fee, in_person, online_medium, subjects };
-        const newUser = { first_name, last_name, email, user_password, gender, tutor, student, fee, in_person, online_medium };
+        const newUser = { first_name, last_name, email, user_password, gender, tutor, student, fee, rating, in_person, online_medium };
 
         for (const [key, value] of Object.entries(userFields)) {
-            if (value === null) {
+            if (value === undefined) {
                 return res.status(400).json({
                     error: { message: `Missing ${key} in request body` }
                 })
