@@ -14,7 +14,7 @@ module.exports = {
         })
         return Promise.all(allSubjectNames)
         .catch((err) => {
-            return res.status(500).json({
+            return res.status(400).json({
                 error: { message: `This is the message: ${err.message}` }
             })
         })
@@ -40,7 +40,7 @@ module.exports = {
                 )
             })
             .catch((err) => {
-                return res.status(500).json({
+                return res.status(400).json({
                     error: { message: `This is the message: ${err.message}` }
                 })
             })
@@ -52,7 +52,7 @@ module.exports = {
                 tutorSubjectRelation
             )
             .catch((err) => {
-                return res.status(500).json({
+                return res.status(400).json({
                     error: { message: `This is the message: ${err.message}` }
                 })
             })

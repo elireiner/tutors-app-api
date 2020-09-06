@@ -93,12 +93,12 @@ const addSubjectsToEachUser = (knexInstance, users, res) => {
             return res.status(200).send(connectEachUserWithSubjects(users, results));
         }).catch((err) => {
             //console.log("86:", err.message)
-            return res.status(500).end();
+            return res.status(400).end();
         })
     })
         .catch(err => {
             //console.log("90:", err.message)
-            return res.status(500).end();
+            return res.status(400).end();
         })
 }
 
@@ -129,7 +129,6 @@ usersRouter
         }
 
         let user = []
-        console.log("Hi I'm here:", newUser)
         const tutorSubjectRelation = [{ subjects_id: null, user_id: null }]
         UsersService.insertUser(
             req.app.get('db'),
@@ -161,7 +160,7 @@ usersRouter
                                         )
                                     })
                                     .catch((err) => {
-                                        return res.status(500).json({
+                                        return res.status(400).json({
                                             error: { message: `This is the message: ${err.message}` }
                                         })
                                     })
