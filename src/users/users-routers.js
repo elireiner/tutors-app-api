@@ -175,6 +175,14 @@ usersRouter
                             }
 
                         })
+                        .catch(error => {
+                            // TODO: check if we need this two times
+                            res.status(400).json({
+                                error: {
+                                    message: "Email exists already",
+                                }
+                            })
+                        })
                         .catch(next)
                 })
             })
@@ -196,7 +204,18 @@ usersRouter
                         user_id: id
                     })
             })
-            .catch(next)
+            .catch(error => {
+
+                if (error.message.includes("duplicate key")) {
+                    res.status(400).json({
+                        error: {
+                            message: "Email exists already",
+                        }
+                    })
+                }
+
+                next(error)
+            })
     })
     .delete(jsonParser, (req, res, next) => {
         TutorsSubjectsService.deleteAllTutorSubject(req.app.get('db'))
@@ -252,7 +271,7 @@ usersRouter
                     last_name: xss(res.user.last_name),
                     email: xss(res.user.email),
                     fee: res.user.fee,
-                    password: xss(res.user. user_password),
+                    password: xss(res.user.user_password),
                     gender: xss(res.user.gender),
                     rating: res.user.rating,
                     tutor: res.user.tutor,
