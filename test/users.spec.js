@@ -1,7 +1,7 @@
 const knex = require('knex')
 const app = require('../src/app')
 const supertest = require('supertest');
-const { makeUsersArray, makeMaliciousUser } = require('./users.fixtures')
+const { cleanTables } = require('./test-helpers')
 
 describe('Tutors app', () => {
     let db;
@@ -9,77 +9,92 @@ describe('Tutors app', () => {
     before('make knex instance', () => {
         db = knex({
             client: 'pg',
-            connection: process.env.TEST_DATABASE_URL
+            connection: process.env.TEST_DB_URL,
         })
         app.set('db', db)
     })
 
-    // ! they aren't working
-    
-    after('disconnect from db', () => db.destroy())
+    after('disconnect from db', () => db.destroy());
 
-    before('clean the table', () => {
-        knex.raw('TRUNCATE tutors_subjects, subjects, users')
-    })
+    //before('cleanup', () => cleanTables(db))
 
-    afterEach('cleanup', () => {
-        knex.raw('TRUNCATE tutors_subjects, subjects, users')
-    })
+    //afterEach('cleanup', () => cleanTables(db))
+ 
 
     describe('GET api/users', () => {
-        context('when the there are no users', () => {
-            it('returns 200 and []', () => {
+            it('returns 200', () => {
                 return supertest(app)
                     .get('/api/users')
                     .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
-                    .expect(200, [])
-
-            })
-        })
-
-        context('When there are users in the db', () => {
-            const testUsers = makeUsersArray();
-
-            beforeEach('insert users in table', () => {
-                return db
-                    .into('users')
-                    .insert(testUsers)
-            })
-
-            it('returns expected users', () => {
-                return supertest(app)
-                    .get(`/api/users`)
-                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
                     .expect(200)
-                    .expect(res => {
-                        console.log(res.body.email)
-                        expect(res.body[0].email).to.eql(testUsers[0].email)
-                        expect(res.body[0].tutor).to.eql(testUsers[0].tutor)
-                    })
             })
+    })
 
-        })
-
-        context('Given an xxs attack', () => {
-            const { maliciousUser, expectedUser } = makeMaliciousUser()
-            beforeEach('insert users in table', () => {
-                return db
-                    .into('users')
-                    .insert(maliciousUser)
-            })
-
-            it('returns a sanitized user', () => {
+    describe('POST api/users', () => {
+        context('When the email does not exist yet', () => {
+            it('responds with 201', () => {
+                const testUsers = {
+                    first_name: "Eli",
+                    last_name: "Reiner",
+                    email: "goelyukim@g.com",
+                    user_password: "plplplplokokok",
+                    online_medium: true,
+                    in_person: false,
+                    student: false,
+                    tutor: true,
+                    gender: "male",
+                    rating: null,
+                    fee: 9,
+                    subjects: []
+                }
 
                 return supertest(app)
-                    .get(`/api/users`)
+                    .post('/api/users')
                     .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
-                    .expect(200)
-                    .expect(res => {
-                        expect(res.body[0].email).to.eql(expectedUser.email)
-                        expect(res.body[0].gender).to.eql(expectedUser.gender)
-                    })
+                    .send(testUsers)
+                    .expect(201)
             })
         })
+
+        context('Given invalid fields it returns 400 and an error', () => {
+            it('responds with 400', () => {
+                const invalidTestUsers = {
+                    name: "Eli"
+                }
+
+                return supertest(app)
+                    .post('/api/users')
+                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .send(invalidTestUsers)
+                    .expect(400)
+            })
+        })
+    })
+
+    describe('GET api/users/:user_id', () => {
+        context('When there is a user in the db', () => {
+            it('returns 200 and a user', () => {
+                return supertest(app)
+                    .get('/api/users/1')
+                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .expect(200)
+            })
+        })
+    })
+
+    describe('DELETE api/users/:user_id', () => {
+        context('When there is a user in the db', () => {
+            it('returns 204', () => {
+                return supertest(app)
+                    .delete('/api/users/1')
+                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .expect(204)
+            })
+        })
+    })
+
+    describe('PATCH api/users/:user_id', () => {
+
     })
 
 })
