@@ -1,6 +1,8 @@
 const UsersService = {
     getAllUsers(knex) {
-        return knex.select('*').from('users')
+        return knex
+            .from('users')
+            .select()
     },
 
     insertUser(knex, newUser) {
@@ -25,11 +27,15 @@ const UsersService = {
         return knex('users')
             .where({  'user_id': id })
             .delete()
+            .then()
     },
 
     deleteAllUsers(knex) {
         return knex('users')
             .delete()
+            .then(res => {
+                db.raw(`ALTER SEQUENCE users minvalue 0 START WITH 1`)
+            })
     },
 
     updateUser(knex, id, newUserFields) {

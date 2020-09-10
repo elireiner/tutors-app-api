@@ -11,7 +11,7 @@
     "connect:production": "heroku pg:psql",
     "migrate": "postgrator --config postgrator-config.js",
     "migrate:test": "env NODE_ENV=test npm run migrate",
-    "migrate:production": "env SSL=true DB_URL=$(heroku config:get DB_URL) npm run migrate",
+    "migrate:production": "_URL=$(heroku config:get DATABASE_URL) npm run migrate",
     "predeploy": "npm audit && npm run migrate:production",
     "deploy": "git push heroku master",
     "postdeploy": "npm run migrate:production",

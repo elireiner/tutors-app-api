@@ -3,7 +3,7 @@ process.env.TZ = 'UTC'
 
 require('dotenv').config()
 
-process.env.TEST_DB_URL = process.env.TEST_DB_URL
+process.env.TEST_DATABASE_URL = process.env.TEST_DATABASE_URL
   || "postgresql://dunder_mifflin@localhost/tutors_app_test"
   
 const { expect } = require('chai');
