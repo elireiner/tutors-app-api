@@ -19,15 +19,16 @@ describe('Tutors app', () => {
     //before('cleanup', () => cleanTables(db))
 
     //afterEach('cleanup', () => cleanTables(db))
- 
+
+    let testUser;
 
     describe('GET api/users', () => {
-            it('returns 200', () => {
-                return supertest(app)
-                    .get('/api/users')
-                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
-                    .expect(200)
-            })
+        it('returns 200', () => {
+            return supertest(app)
+                .get('/api/users')
+                .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                .expect(200)
+        })
     })
 
     describe('POST api/users', () => {
@@ -53,6 +54,10 @@ describe('Tutors app', () => {
                     .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
                     .send(testUsers)
                     .expect(201)
+                    .then(res => {
+                        //Set the new user id in a variable so we can GET and DELETE it soon
+                        testUser = res.body.user_id;
+                    })
             })
         })
 
@@ -73,9 +78,9 @@ describe('Tutors app', () => {
 
     describe('GET api/users/:user_id', () => {
         context('When there is a user in the db', () => {
-            it('returns 200 and a user', () => {
+            it('returns 200', () => {
                 return supertest(app)
-                    .get('/api/users/1')
+                    .get(`/api/users/${testUser}`)
                     .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
                     .expect(200)
             })
@@ -86,7 +91,7 @@ describe('Tutors app', () => {
         context('When there is a user in the db', () => {
             it('returns 204', () => {
                 return supertest(app)
-                    .delete('/api/users/1')
+                    .delete(`/api/users/${testUser}`)
                     .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
                     .expect(204)
             })
