@@ -17,4 +17,4 @@ CREATE TABLE users (
     CONSTRAINT tutor_or_student_must_be_true 
     CHECK ( (tutor) OR (student) ),
     UNIQUE (email)
-)
+);
