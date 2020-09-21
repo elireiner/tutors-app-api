@@ -2,6 +2,17 @@
 
 This is the API for the tutors app.
 
+## API endpoints
+
+Use GET `/api/users/` to get all users
+
+Use POST `/api/users/` to add a user
+
+Use GET `/api/users/:userId` to get a specific user
+
+Use DELETE `/api/users/:userId` to delete a specific user
+
+Use PATCH `/api/users/:userId` to update a specific user
 
 ## Scripts
 
