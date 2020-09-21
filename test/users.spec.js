@@ -1,26 +1,20 @@
-const knex = require('knex')
-const app = require('../src/app')
+const knex = require('knex');
+const app = require('../src/app');
 const supertest = require('supertest');
-const { cleanTables } = require('./test-helpers')
 
 describe('Tutors app', () => {
     let db;
+    let testUser;
 
     before('make knex instance', () => {
         db = knex({
             client: 'pg',
             connection: process.env.TEST_DATABASE_URL,
-        })
+        });
         app.set('db', db)
     })
 
     after('disconnect from db', () => db.destroy());
-
-    //before('cleanup', () => cleanTables(db))
-
-    //afterEach('cleanup', () => cleanTables(db))
-
-    let testUser;
 
     describe('GET api/users', () => {
         it('returns 200', () => {
@@ -97,9 +91,4 @@ describe('Tutors app', () => {
             })
         })
     })
-
-    describe('PATCH api/users/:user_id', () => {
-
-    })
-
 })
