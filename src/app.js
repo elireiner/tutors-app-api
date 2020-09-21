@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-//winston is a logger
+//use winston for logging
 const winston = require('winston');
 const userRouter = require('./users/users-routers');
 
@@ -50,10 +50,6 @@ app.use(function validateBearerToken(req, res, next) {
   }
 
   next();
-});
-
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
 });
 
 app.use('/api/users', userRouter);
