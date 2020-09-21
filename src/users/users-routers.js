@@ -1,27 +1,14 @@
 const path = require('path');
-const express = require('express')
-const xss = require('xss')
-const UsersService = require('./users-service')
-const SubjectsService = require('./subjects-service')
-const TutorsSubjectsService = require('./tutors_subjects-service')
+const express = require('express');
+const xss = require('xss');
+const UsersService = require('./users-service');
+const SubjectsService = require('./subjects-service');
+const TutorsSubjectsService = require('./tutors_subjects-service');
 const RouterHelpers = require('./router-helpers');
 const knex = require('knex');
 
-const usersRouter = express.Router()
-const jsonParser = express.json()
-
-const serialize = user => ({
-    id: user.id,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    email: xss(user.email),
-    password: user.password,
-    gender: xss(user.gender),
-    rating: user.rating,
-    tutor: user.tutor,
-    student: user.student,
-    fee: user.fee
-})
+const usersRouter = express.Router();
+const jsonParser = express.json();
 
 const connectEachUserWithSubjects = (users, subjects) => {
     let i = 0
@@ -50,22 +37,20 @@ const connectEachUserWithSubjects = (users, subjects) => {
         i++
     })
     return users
-}
+};
 
-const testIt = (knexInstance, subjectsArray) => {
+const getSubjectNames = (knexInstance, subjectsIdsArray) => {
 
+    //return array of promises
     return Promise.all(
-        subjectsArray.map((id) => {
+        subjectsIdsArray.map((id) => {
 
             return SubjectsService.getById(knexInstance, id.subjects_id);
 
         })).then(res => {
             return res
         })
-
-    //return array of promises
-
-}
+};
 
 const addSubjectsToEachUser = (knexInstance, users, res) => {
 
@@ -83,7 +68,7 @@ const addSubjectsToEachUser = (knexInstance, users, res) => {
         //instead of the subject id, we need to get the names:
         Promise.all(userResults.reduce((acc, el) => {
             //for each user create array of promises given the subject list
-            acc = acc.concat(testIt(knexInstance, el))
+            acc = acc.concat(getSubjectNames(knexInstance, el))
             return acc
         }, [])).then((results) => {
             //The previous promise resolves to an array of subject names
