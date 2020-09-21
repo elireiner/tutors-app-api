@@ -26,7 +26,7 @@ describe('Tutors app', () => {
         it('returns 200', () => {
             return supertest(app)
                 .get('/api/users')
-                .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                .set({ 'Authorization': `Bearer ${process.env.API_TOKEN}` })
                 .expect(200)
         })
     })
@@ -35,15 +35,15 @@ describe('Tutors app', () => {
         context('When the email does not exist yet', () => {
             it('responds with 201', () => {
                 const testUsers = {
-                    first_name: "Eli",
-                    last_name: "Reiner",
-                    email: "goelyukim@g.com",
-                    user_password: "plplplplokokok",
+                    first_name: 'Eli',
+                    last_name: 'Reiner',
+                    email: 'goelyukim@g.com',
+                    user_password: 'plplplplokokok',
                     online_medium: true,
                     in_person: false,
                     student: false,
                     tutor: true,
-                    gender: "male",
+                    gender: 'male',
                     rating: null,
                     fee: 9,
                     subjects: []
@@ -51,7 +51,7 @@ describe('Tutors app', () => {
 
                 return supertest(app)
                     .post('/api/users')
-                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .set({ 'Authorization': `Bearer ${process.env.API_TOKEN}` })
                     .send(testUsers)
                     .expect(201)
                     .then(res => {
@@ -64,12 +64,12 @@ describe('Tutors app', () => {
         context('Given invalid fields it returns 400 and an error', () => {
             it('responds with 400', () => {
                 const invalidTestUsers = {
-                    name: "Eli"
+                    name: 'Eli'
                 }
 
                 return supertest(app)
                     .post('/api/users')
-                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .set({ 'Authorization': `Bearer ${process.env.API_TOKEN}` })
                     .send(invalidTestUsers)
                     .expect(400)
             })
@@ -81,7 +81,7 @@ describe('Tutors app', () => {
             it('returns 200', () => {
                 return supertest(app)
                     .get(`/api/users/${testUser}`)
-                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .set({ 'Authorization': `Bearer ${process.env.API_TOKEN}` })
                     .expect(200)
             })
         })
@@ -92,7 +92,7 @@ describe('Tutors app', () => {
             it('returns 204', () => {
                 return supertest(app)
                     .delete(`/api/users/${testUser}`)
-                    .set({ "Authorization": `Bearer ${process.env.API_TOKEN}` })
+                    .set({ 'Authorization': `Bearer ${process.env.API_TOKEN}` })
                     .expect(204)
             })
         })

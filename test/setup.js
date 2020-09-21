@@ -4,7 +4,7 @@ process.env.TZ = 'UTC'
 require('dotenv').config()
 
 process.env.TEST_DATABASE_URL = process.env.TEST_DATABASE_URL
-  || "postgresql://dunder_mifflin@localhost/tutors_app_test"
+  || 'postgresql://dunder_mifflin@localhost/tutors_app_test'
   
 const { expect } = require('chai');
 const supertest = require('supertest');

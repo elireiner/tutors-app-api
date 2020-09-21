@@ -92,12 +92,10 @@ const addSubjectsToEachUser = (knexInstance, users, res) => {
             //* Here the response is sent to the end user
             return res.status(200).send(connectEachUserWithSubjects(users, results));
         }).catch((err) => {
-            //console.log("86:", err.message)
             return res.status(400).end();
         })
     })
         .catch(err => {
-            //console.log("90:", err.message)
             return res.status(400).end();
         })
 }
@@ -179,7 +177,7 @@ usersRouter
                             // TODO: check if we need this two times
                             res.status(400).json({
                                 error: {
-                                    message: "Email exists already",
+                                    message: 'Email exists already',
                                 }
                             })
                         })
@@ -206,10 +204,10 @@ usersRouter
             })
             .catch(error => {
 
-                if (error.message.includes("duplicate key")) {
+                if (error.message.includes('duplicate key')) {
                     res.status(400).json({
                         error: {
-                            message: "Email exists already",
+                            message: 'Email exists already',
                         }
                     })
                 }
@@ -263,7 +261,7 @@ usersRouter
             .then(function (results) {
                 //Since xss removes the array and combines all elements into one,
                 //We need to restore them 
-                res.user.subjects = xss(results).split(",");
+                res.user.subjects = xss(results).split(',');
 
                 res.json({
                     user_id: res.user.user_id,

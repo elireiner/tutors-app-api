@@ -28,7 +28,7 @@ module.exports = {
     },
 
     handleTutorSubjectRelations(knexInstance, subject, res, tutorSubjectRelation) {
-        if (typeof res === "undefined" || res.length === 0) {
+        if (typeof res === 'undefined' || res.length === 0) {
             SubjectsService.getBySubject(
                 knexInstance,
                 subject
